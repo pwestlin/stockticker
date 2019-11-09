@@ -1,5 +1,6 @@
 stocks:
   prefix: foo
+  initSize: 30
   random:
     lowerTime: 1000
     upperTime:  3000

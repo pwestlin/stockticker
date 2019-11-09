@@ -1,6 +1,5 @@
 package nu.westlin.ticker.server
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import nu.westlin.ticker.model.Stock
@@ -28,8 +27,8 @@ val loggingConfig = configuration {
     }
 }
 
-data class StockProperties(val prefix: String, val random: Random) {
-    data class Random(val lowerTime: Long, val upperTime: Long)
+data class StockProperties(val prefix: String = "foo", val initSize: Int = 30, val random: Random) {
+    data class Random(val lowerTime: Long = 1000, val upperTime: Long = 3000, val lowerPrice: Int = 10, val upperPrice: Int = 999)
 }
 
 class StockRepository(private val stockProperties: StockProperties) {
@@ -40,7 +39,7 @@ class StockRepository(private val stockProperties: StockProperties) {
     }
 
 
-    private fun add(stock: Stock) {
+    internal fun add(stock: Stock) {
         if (stocks.containsKey(stock.name)) {
             stocks[stock.name]!!.add(stock)
         } else {
@@ -62,8 +61,8 @@ class StockRepository(private val stockProperties: StockProperties) {
 
     fun init() {
         val stockNames = listOf("Microsoft", "Red Hat", "Saab", "Volvo", "Stora Enso", "Sogeti")
-        repeat(30) {
-            add(Stock("${stockProperties.prefix} - ${stockNames.random()}", Random.nextInt(1, 999), Instant.now()))
+        repeat(stockProperties.initSize) {
+            add(Stock("${stockProperties.prefix} - ${stockNames.random()}", Random.nextInt(stockProperties.random.lowerPrice, stockProperties.random.upperPrice + 1), Instant.now()))
         }
     }
 
@@ -82,7 +81,7 @@ class StockRepository(private val stockProperties: StockProperties) {
                         add(stock.copy(price = newPrice(stock), time = Instant.now()))
                     }
                 }
-                Thread.sleep(Random.nextLong(stockProperties.random.lowerTime, stockProperties.random.upperTime))
+                Thread.sleep(Random.nextLong(stockProperties.random.lowerTime, stockProperties.random.upperTime + 1))
             }
         }
     }
@@ -110,6 +109,7 @@ class RestHandler(private val stockRepository: StockRepository) {
     suspend fun stocks(request: ServerRequest): ServerResponse {
         return ServerResponse.ok().bodyAndAwait(stockRepository.currentStocks())
     }
+
     suspend fun history(request: ServerRequest): ServerResponse {
         return ServerResponse.ok().bodyAndAwait(stockRepository.stockHistory(request.pathVariable("name")))
     }
