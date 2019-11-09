@@ -1,0 +1,18 @@
+{
+  "properties": [
+    {
+      "name": "stocks.random.upperTime",
+      "type": "java.lang.String",
+      "description": "Description for stocks.random.upperTime."
+    },
+    {
+      "name": "stocks.random.lowerTime",
+      "type": "java.lang.String",
+      "description": "Description for stocks.random.lowerTime."
+    },
+    {
+      "name": "stocks.prefix",
+      "type": "java.lang.String",
+      "description": "Description for stocks.prefix."
+    }
+  ] }

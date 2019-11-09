@@ -1,0 +1,5 @@
+stocks:
+  prefix: foo
+  random:
+    lowerTime: 1000
+    upperTime:  3000
