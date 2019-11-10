@@ -1,5 +1,3 @@
-spring.main.web-application-type: none
-logging.level:
-  root: warn
-  nu.westlin.ticker: debug
-
+servers:
+  AUTO_MAKES: http://localhost:8080/stocks
+  Aerospace: http://localhost:8081/stocks

@@ -30,3 +30,8 @@ dependencyManagement {
         mavenBom("io.r2dbc:r2dbc-bom:Arabba-RC2")
     }
 }
+
+tasks.getByName<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
+    @Suppress("UNCHECKED_CAST")
+    systemProperties = System.getProperties().toMap() as Map<String, Any>
+}

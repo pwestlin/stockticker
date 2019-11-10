@@ -27,10 +27,20 @@ val loggingConfig = configuration {
     }
 }
 
-data class StockProperties(val prefix: String = "foo", val initSize: Int = 30, val random: Random) {
+// TODO: Should this be in the model module?
+@Suppress("unused")
+enum class StockType(val names: List<String>) {
+    AEROSPACE(listOf("BRFS", "HRL", "IBA", "JEF", "TSN")),
+    MOVIES(listOf("CNK", "MCS", "WWE")),
+    AUTO_MAKES(listOf("FSS", "F", "GM", "HMC", "TM")),
+    COMPUTER_SERVICES(listOf("BTSNY", "CGEMY", "NTNTY", "RVTTY"))
+}
+
+data class StockProperties(val initSize: Int = 30, val random: Random, val stockType: StockType = StockType.MOVIES) {
     data class Random(val lowerTime: Long = 1000, val upperTime: Long = 3000, val lowerPrice: Int = 10, val upperPrice: Int = 999)
 }
 
+// TODO: Impl this with R2DBC and a in-memory H2?
 class StockRepository(private val stockProperties: StockProperties) {
     private val stocks = Collections.synchronizedMap(mutableMapOf<String, ArrayList<Stock>>())
 
@@ -45,6 +55,7 @@ class StockRepository(private val stockProperties: StockProperties) {
         } else {
             stocks[stock.name] = listOf(stock).toMutableList() as ArrayList<Stock>
         }
+        logger.debug("Added stock $stock")
     }
 
     fun currentStocks(): Flow<Stock> {
@@ -61,9 +72,8 @@ class StockRepository(private val stockProperties: StockProperties) {
 
     // TODO: Move this to a separate class?
     fun init() {
-        val stockNames = listOf("Microsoft", "Red Hat", "Saab", "Volvo", "Stora Enso", "Sogeti")
         repeat(stockProperties.initSize) {
-            add(Stock("${stockProperties.prefix} - ${stockNames.random()}", Random.nextInt(stockProperties.random.lowerPrice, stockProperties.random.upperPrice + 1), Instant.now()))
+            add(Stock(stockProperties.stockType.names.random(), Random.nextInt(stockProperties.random.lowerPrice, stockProperties.random.upperPrice + 1), Instant.now()))
         }
     }
 
@@ -73,7 +83,6 @@ class StockRepository(private val stockProperties: StockProperties) {
             val value = Random.nextInt(0, 10).let {
                 if (Random.nextBoolean()) (it * -1) else it
             }
-            logger.debug("value = $value")
             return stock.price + value
         }
         thread {
@@ -131,6 +140,7 @@ val webConfig = configuration {
     }
 
     webFlux {
+        port = System.getProperty("server.port")?.toInt() ?: 8080
         codecs {
             string()
             jackson()
@@ -142,8 +152,16 @@ val app = application(WebApplicationType.REACTIVE) {
     enable(loggingConfig)
     enable(dataConfig)
     enable(webConfig)
+
+    listener<ApplicationReadyEvent> {
+        val props = ref<StockProperties>()
+        logger.debug("Server for stocks of type ${props.stockType} started on port ${System.getProperty("server.port")?.toInt()
+            ?: 8080}")
+    }
 }
 
-fun main() {
-    app.run()
+private val logger = LoggerFactory.getLogger("nu.westlin.ticker.server.Server")
+
+fun main(args: Array<String>) {
+    app.run(args)
 }

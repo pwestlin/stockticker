@@ -7,11 +7,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.test.util.ReflectionTestUtils
 import java.time.Instant
+import java.util.Properties
 
 // TODO: Switch impl to use R2DBC with H2 in-memory DB?
 internal class StockRepositoryTest {
 
-    private val stockProperties = StockProperties(prefix = "foo", initSize = 5, random = StockProperties.Random(1, 2))
+    private val stockProperties = StockProperties(initSize = 5, random = StockProperties.Random(1, 2), stockType = StockType.AEROSPACE)
     private val repository = StockRepository(stockProperties)
 
     @Test
@@ -57,7 +58,14 @@ internal class StockRepositoryTest {
         val stocks = repository.stocks().values.flatten()
         assertThat(stocks.size).isEqualTo(stockProperties.initSize)
         assertThat(stocks).filteredOn { it.price < stockProperties.random.lowerPrice || it.price > stockProperties.random.upperPrice }.isEmpty()
-        assertThat(stocks).allMatch { it.name.startsWith("${stockProperties.prefix} - ") }
+        assertThat(stocks).allMatch { stockProperties.stockType.names.contains(it.name) }
+    }
+
+    @Test
+    fun `asfgasdt gasg`() {
+        val props: Properties = System.getProperties()
+        val map = props.toMap() as Map<String, Any>
+        println(map)
     }
 }
 

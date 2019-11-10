@@ -1,5 +1,5 @@
 stocks:
-  prefix: foo
+  stockType: MOVIES
   initSize: 30
   random:
     lowerTime: 1000

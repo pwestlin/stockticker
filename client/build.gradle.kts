@@ -9,8 +9,7 @@ dependencies {
     implementation(project(":model"))
     implementation(kotlin("stdlib"))
 
-    //implementation("org.springframework.boot:spring-boot-starter")
-    //implementation("org.springframework:spring-webflux")
+    implementation("org.springframework.fu:spring-fu-kofu:0.2.2.BUILD-SNAPSHOT")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
