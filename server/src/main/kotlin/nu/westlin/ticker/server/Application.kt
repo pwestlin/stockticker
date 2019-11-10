@@ -59,6 +59,7 @@ class StockRepository(private val stockProperties: StockProperties) {
         return stocks.map { entry -> entry.value.maxBy { it.time } }.filterNotNull()
     }
 
+    // TODO: Move this to a separate class?
     fun init() {
         val stockNames = listOf("Microsoft", "Red Hat", "Saab", "Volvo", "Stora Enso", "Sogeti")
         repeat(stockProperties.initSize) {
@@ -66,6 +67,7 @@ class StockRepository(private val stockProperties: StockProperties) {
         }
     }
 
+    // TODO: Move this to a separate class?
     fun randomCreate() {
         fun newPrice(stock: Stock): Int {
             val value = Random.nextInt(0, 10).let {
