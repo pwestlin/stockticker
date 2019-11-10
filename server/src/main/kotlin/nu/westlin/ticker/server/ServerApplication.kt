@@ -14,11 +14,14 @@ import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.bodyAndAwait
+import org.springframework.web.reactive.function.server.bodyValueAndAwait
 import org.springframework.web.reactive.function.server.coRouter
 import java.time.Instant
 import java.util.Collections
 import kotlin.concurrent.thread
 import kotlin.random.Random
+
+// TODO petves: Refactor to separate files
 
 val loggingConfig = configuration {
     logging {
@@ -55,7 +58,6 @@ class StockRepository(private val stockProperties: StockProperties) {
         } else {
             stocks[stock.name] = listOf(stock).toMutableList() as ArrayList<Stock>
         }
-        logger.debug("Added stock $stock")
     }
 
     fun currentStocks(): Flow<Stock> {
@@ -114,8 +116,9 @@ val dataConfig = configuration {
 }
 
 
+// TODO: Test
 @Suppress("UNUSED_PARAMETER")
-class RestHandler(private val stockRepository: StockRepository) {
+class RestHandler(private val stockRepository: StockRepository, private val stockProperties: StockProperties) {
 
     suspend fun stocks(request: ServerRequest): ServerResponse {
         return ServerResponse.ok().bodyAndAwait(stockRepository.currentStocks())
@@ -124,12 +127,18 @@ class RestHandler(private val stockRepository: StockRepository) {
     suspend fun history(request: ServerRequest): ServerResponse {
         return ServerResponse.ok().bodyAndAwait(stockRepository.stockHistory(request.pathVariable("name")))
     }
+
+    suspend fun stockTypes(request: ServerRequest): ServerResponse {
+        return ServerResponse.ok().bodyValueAndAwait(stockProperties.stockType)
+    }
 }
 
+// TODO: Test
 fun routes(restHandler: RestHandler) = coRouter {
     accept(MediaType.APPLICATION_JSON).nest {
         GET("/stocks", restHandler::stocks)
         GET("/stocks/{name}", restHandler::history)
+        GET("/stockType", restHandler::stockTypes)
     }
 }
 

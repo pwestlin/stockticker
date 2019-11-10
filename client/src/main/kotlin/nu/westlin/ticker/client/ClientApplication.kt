@@ -46,6 +46,7 @@ class Client(private val properties: ClientProperties) {
     // TODO petves: Coroutines and async (map to new list)
     fun printStocks() = runBlocking {
         // TODO petves: Only show stocks that have changed it's price and show the diff with +/-
+        // TODO: On startup, save url and result of GET url/stockType in an object for later display. Then change map to list for servers in application.yml
         properties.servers.forEach { (type, url) ->
             val stocks = webClient.get().uri(url).accept(MediaType.APPLICATION_JSON)
                 .awaitExchange().awaitBody<List<Stock>>()
