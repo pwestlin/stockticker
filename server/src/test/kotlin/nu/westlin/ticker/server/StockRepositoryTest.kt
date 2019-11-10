@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.test.util.ReflectionTestUtils
 import java.time.Instant
 
+// TODO: Switch impl to use R2DBC with H2 in-memory DB?
 internal class StockRepositoryTest {
 
     private val stockProperties = StockProperties(prefix = "foo", initSize = 5, random = StockProperties.Random(1, 2))
