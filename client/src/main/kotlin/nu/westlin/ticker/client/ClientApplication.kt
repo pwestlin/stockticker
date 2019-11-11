@@ -13,6 +13,8 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.awaitBody
 import org.springframework.web.reactive.function.client.awaitExchange
 
+// TODO: Ktor client instead of Spring Kofu?
+
 fun main(args: Array<String>) {
     app.run(args).getBean<Client>().printStocks()
 }

@@ -7,7 +7,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.test.util.ReflectionTestUtils
 import java.time.Instant
-import java.util.Properties
 
 // TODO: Switch impl to use R2DBC with H2 in-memory DB?
 internal class StockRepositoryTest {
@@ -59,13 +58,6 @@ internal class StockRepositoryTest {
         assertThat(stocks.size).isEqualTo(stockProperties.initSize)
         assertThat(stocks).filteredOn { it.price < stockProperties.random.lowerPrice || it.price > stockProperties.random.upperPrice }.isEmpty()
         assertThat(stocks).allMatch { stockProperties.stockType.names.contains(it.name) }
-    }
-
-    @Test
-    fun `asfgasdt gasg`() {
-        val props: Properties = System.getProperties()
-        val map = props.toMap() as Map<String, Any>
-        println(map)
     }
 }
 
